@@ -19,6 +19,10 @@ defmodule Neuron do
     GenServer.call neuron_pid, {:add_output, output_pid}
   end
 
+  def electrocute(neuron_pid, amount) do
+    GenServer.cast neuron_pid, {:electrocute, amount}
+  end
+
   # server callbacks
   def init(:ok) do
     opts = [] # todo, start the genserver with options
@@ -35,9 +39,9 @@ defmodule Neuron do
     {:reply, :ok, state}
   end
 
-  def handle_cast({:electrocute, opts}, state) do
-    # todo: do something useful
-    {:noreply, state}
+  def handle_cast({:electrocute, amount}, state) do
+    {_old_level, new_state} = Keyword.get_and_update!(state, :current_charge, &({&1, &1 + amount}))
+    {:noreply, new_state}
   end
 
   # helper functions
